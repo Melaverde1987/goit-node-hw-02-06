@@ -1,98 +1,87 @@
-import * as moviesService from "../models/movies/index.js";
+import * as contactsService from "../models/contacts/index.js";
 
 import { HttpError } from "../helpers/index.js";
 
-import { movieAddSchema, movieUpdateSchema } from "../schemas/movie-schemas.js";
+import {
+  contactAddSchema,
+  contactUpdateSchema,
+} from "../schemas/contact-schemas.js";
 
 const getAll = async (req, res, next) => {
-    try {
-        const result = await moviesService.getAllMovies();
+  try {
+    const result = await contactsService.listContacts();
 
-        res.json(result);
-    }
-    catch (error) {
-        next(error);
-    }
-}
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
 
 const getById = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        const result = await moviesService.getMovieById(id);
-        if (!result) {
-            throw HttpError(404, `Movie with id=${id} not found`);
-            // const error = new Error(`Movie with id=${id} not found`);
-            // error.status = 404;
-            // throw error;
-            // return res.status(404).json({
-            //     message: `Movie with id=${id} not found`
-            // })
-        }
+  try {
+    const { id } = req.params;
+    const result = await contactsService.getContactById(id);
+    if (!result) {
+      throw HttpError(404, `Not found`);
+    }
 
-        res.json(result);
-    }
-    catch (error) {
-        next(error);
-    }
-}
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
 
 const add = async (req, res, next) => {
-    try {
-        const { error } = movieAddSchema.validate(req.body);
-        if (error) {
-            throw HttpError(400, error.message);
-        }
-        const result = await moviesService.addMovie(req.body);
+  try {
+    const { error } = contactAddSchema.validate(req.body);
+    if (error) {
+      throw HttpError(400, error.message);
+    }
+    const result = await contactsService.addContact(req.body);
 
-        res.status(201).json(result)
-    }
-    catch (error) {
-        next(error);
-    }
-}
+    res.status(201).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
 
 const updateById = async (req, res, next) => {
-    try {
-        const { error } = movieUpdateSchema.validate(req.body);
-        if (error) {
-            throw HttpError(400, error.message);
-        }
-        const { id } = req.params;
-        const result = await moviesService.updateMovieById(id, req.body);
-        if (!result) {
-            throw HttpError(404, `Movie with id=${id} not found`);
-        }
+  try {
+    const { error } = contactUpdateSchema.validate(req.body);
+    if (error) {
+      throw HttpError(400, error.message);
+    }
+    const { id } = req.params;
+    const result = await contactsService.updateContact(id, req.body);
+    if (!result) {
+      throw HttpError(404, `Not found`);
+    }
 
-        res.json(result);
-    }
-    catch (error) {
-        next(error);
-    }
-}
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
 
 const deleteById = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        const result = await moviesService.deleteById(id);
-        if (!result) {
-            throw HttpError(404, `Movie with id=${id} not found`);
-        }
-
-        // res.status(204).send()
-
-        res.json({
-            message: "Delete success"
-        })
+  try {
+    const { id } = req.params;
+    const result = await contactsService.removeContact(id);
+    if (!result) {
+      throw HttpError(404, `Not found`);
     }
-    catch (error) {
-        next(error);
-    }
-}
+    res.json({
+      message: "Contact deleted",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 export default {
-    getAll,
-    getById,
-    add,
-    updateById,
-    deleteById,
-}
+  getAll,
+  getById,
+  add,
+  updateById,
+  deleteById,
+};
