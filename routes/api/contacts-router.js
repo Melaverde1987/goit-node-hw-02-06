@@ -2,28 +2,43 @@ import express from "express";
 
 import contactsService from "../../models/contacts/index.js";
 
-const contactsRouter = express.Router()
+const contactsRouter = express.Router();
 
-contactsRouter.get('/', async (req, res, next) => {
+contactsRouter.get("/", async (req, res, next) => {
   const result = await contactsService.listContacts();
-
   res.json(result);
-})
+});
 
-contactsRouter.get('/:contactId', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+contactsRouter.get("/:contactId", async (req, res, next) => {
+  const id = req.params.contactId;
+  const result = await contactsService.getContactById(id);
+  res.json(result || res.status(404).json({ message: "Not found" }));
+});
 
-contactsRouter.post('/', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+contactsRouter.post("/", async (req, res, next) => {
+  const contacts = await contactsService.listContacts();
+  const newContact = {
+    id: nanoid(),
+    ...data,
+  };
+  contacts.push(newContact);
+  await updateContacts(contacts);
+  return newContact;
+});
 
-contactsRouter.delete('/:contactId', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+contactsRouter.delete("/:contactId", async (req, res, next) => {
+  const contacts = await contactsService.listContacts();
+  const index = contacts.findIndex((item) => item.id === id);
+  if (index === -1) {
+    return null;
+  }
+  const [result] = contacts.splice(index, 1);
+  await updateContacts(contacts);
+  return result;
+});
 
-contactsRouter.put('/:contactId', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+contactsRouter.put("/:contactId", async (req, res, next) => {
+  res.json({ message: "template message" });
+});
 
 export default contactsRouter;
