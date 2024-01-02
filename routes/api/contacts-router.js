@@ -16,4 +16,10 @@ contactsRouter.put("/:id", isEmptyBody, contactsController.updateById);
 
 contactsRouter.delete("/:id", contactsController.deleteById);
 
+contactsRouter.patch(
+  "/:id/favorite",
+  isEmptyBody,
+  contactsController.updateStatusContact
+);
+
 export default contactsRouter;
