@@ -41,7 +41,7 @@ export const userSignupSchema = Joi.object({
 export const userSigninSchema = Joi.object({
   email: Joi.string().required(),
   password: Joi.string().min(6).required(),
-  subscription: Joi.string().valid(...subscriptionList),
+  //subscription: Joi.string().valid(...subscriptionList),
 });
 
 const User = model("user", userSchema);

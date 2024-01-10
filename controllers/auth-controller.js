@@ -24,31 +24,39 @@ const signup = async (req, res, next) => {
   const newUser = await User.create({ ...req.body, password: hashPassword });
 
   res.json({
-    username: newUser.username,
     email: newUser.email,
+    password: newUser.password,
   });
   */
 
   try {
-    const { email, password } = userSignupSchema.validate(req.body);
+    const { email, password } = req.body;
+    const { error } = userSignupSchema.validate(req.body);
+
     const user = await User.findOne({ email });
     if (user) {
       throw HttpError(409, "Email already in use");
+    }
+
+    if (error) {
+      throw HttpError(400, error.message);
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
 
     const newUser = await User.create({ ...req.body, password: hashPassword });
     res.status(201).json({
-      username: newUser.username,
-      email: newUser.email,
+      user: {
+        email: newUser.email,
+        subscription: newUser.subscription,
+      },
     });
   } catch (error) {
     next(error);
   }
 };
 
-const signin = async (req, res) => {
+const signin = async (req, res, next) => {
   /*
   const { email, password } = req.body;
   const user = await User.findOne({ email });
@@ -75,15 +83,21 @@ const signin = async (req, res) => {
   */
 
   try {
-    const { email, password } = userSigninSchema.validate(req.body);
+    const { email, password } = req.body;
+    const { error } = userSigninSchema.validate(req.body);
+
     const user = await User.findOne({ email });
     if (!user) {
-      throw HttpError(401, "Email or password invalid");
+      throw HttpError(401, "Email or password is wrong");
+    }
+
+    if (error) {
+      throw HttpError(400, error.message);
     }
 
     const passwordCompare = await bcrypt.compare(password, user.password);
     if (!passwordCompare) {
-      throw HttpError(401, "Email or password invalid");
+      throw HttpError(401, "Email or password is wrong");
     }
 
     const { _id: id } = user;
@@ -96,6 +110,10 @@ const signin = async (req, res) => {
 
     res.json({
       token,
+      user: {
+        email: user.email,
+        subscription: user.subscription,
+      },
     });
   } catch (error) {
     next(error);
