@@ -5,8 +5,6 @@ import User from "../models/User.js";
 
 import { HttpError } from "../helpers/index.js";
 
-//import { ctrlWrapper } from "../decorators/index.js";
-
 import { userSignupSchema, userSigninSchema } from "../models/User.js";
 
 const { JWT_SECRET } = process.env;
@@ -17,12 +15,13 @@ const signup = async (req, res, next) => {
     const { error } = userSignupSchema.validate(req.body);
 
     const user = await User.findOne({ email });
-    if (user) {
-      throw HttpError(409, "Email already in use");
-    }
 
     if (error) {
       throw HttpError(400, error.message);
+    }
+
+    if (user) {
+      throw HttpError(409, "Email already in use");
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
@@ -45,12 +44,12 @@ const signin = async (req, res, next) => {
     const { error } = userSigninSchema.validate(req.body);
 
     const user = await User.findOne({ email });
-    if (!user) {
-      throw HttpError(401, "Email or password is wrong");
-    }
-
     if (error) {
       throw HttpError(400, error.message);
+    }
+
+    if (!user) {
+      throw HttpError(401, "Email or password is wrong");
     }
 
     const passwordCompare = await bcrypt.compare(password, user.password);
@@ -96,7 +95,7 @@ const signout = async (req, res) => {
     const { _id } = req.user;
     await User.findByIdAndUpdate(_id, { token: "" });
 
-    res.status(204);
+    res.status(204).send();
   } catch (error) {
     next(error);
   }
