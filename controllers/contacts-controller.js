@@ -46,17 +46,20 @@ const getById = async (req, res, next) => {
 const add = async (req, res, next) => {
   try {
     const { error } = contactAddSchema.validate(req.body);
-    const { _id: owner } = req.user;
-
-    const { path: oldPath, filename } = req.file;
-    const newPath = path.join(avatarsPath, filename);
-    await fs.rename(oldPath, newPath);
-    const avatar = path.join("avatars", filename);
 
     if (error) {
       throw HttpError(400, error.message);
     }
-    const result = await Contact.create({ ...req.body, avatar, owner });
+
+    const { _id: owner } = req.user;
+    const { path: oldPath, filename } = req.file;
+    const newPath = path.join(avatarsPath, filename);
+
+    await fs.rename(oldPath, newPath);
+
+    const avatarURL = path.join("avatars", filename);
+
+    const result = await Contact.create({ ...req.body, avatarURL, owner });
     res.status(201).json(result);
   } catch (error) {
     next(error);
