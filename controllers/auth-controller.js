@@ -113,13 +113,13 @@ const signout = async (req, res) => {
 
 const updateAvatar = async (req, res, next) => {
   try {
-    const { _id: owner, email } = req.user;
-    const { path: oldPath, filename } = req.file;
-    const newPath = path.join(avatarsPath, filename);
+    const { _id: owner } = req.user;
 
     if (!req.file) {
       return res.status(400).json({ error: "avatar missing" });
     }
+    const { path: oldPath, filename } = req.file;
+    const newPath = path.join(avatarsPath, filename);
 
     await fs.rename(oldPath, newPath);
 
@@ -135,7 +135,6 @@ const updateAvatar = async (req, res, next) => {
     await User.findOneAndUpdate({ _id: owner }, { avatarURL });
 
     res.status(200).json({
-      email,
       avatarURL,
     });
   } catch (error) {
