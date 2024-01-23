@@ -13,6 +13,10 @@ authRouter.post(
   authController.signup
 );
 
+authRouter.get("/verify/:verificationCode", authController.verify);
+
+authRouter.post("/verify", isEmptyBody, authController.resendVerifyEmail);
+
 authRouter.post("/login", isEmptyBody, authController.signin);
 
 authRouter.get("/current", authenticate, authController.getCurrent);
